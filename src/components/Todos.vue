@@ -182,16 +182,24 @@ const Todos = {
   methods: {
     addTodo: function() {
       var value = this.newTodo && this.newTodo.trim();
-      if (!value) {
-        return;
+      if(!value){
+          return
       }
 
-      this.todos.push({
-        title: value,
-        completed: false
-      });
+    api.createNew(value, false).then((response) => {
+        this.$log.debug("New item created : ", response);
+        this.todos.push({
+            id:response.data.id,
+            title:value,
+            completed:false
+        })
+        this.newTodo = ''
+    }).catch((error) => {
+        this.$log.debug(error)
+        this.error = "failed to create new todo";
+    })
 
-      this.newTodo = "";
+    this.newTodo = ''
     },
 
     setVisibility: function(vis) {
@@ -200,10 +208,15 @@ const Todos = {
 
     completeTodo(todo) {},
 
-    removeTodo: function(todo) {
-      // notice NOT using "=>" syntax
-      this.todos.splice(this.todos.indexOf(todo), 1);
-    },
+    removeTodo: function (todo) { 
+    api.removeForId(todo.id).then(() => { 
+      this.$log.debug("Item removed:", todo);  
+      this.todos.splice(this.todos.indexOf(todo), 1)  
+    }).catch((error) => {  
+      this.$log.debug(error);  
+      this.error = "Failed to remove todo"  
+    });
+  },  
 
     editTodo: function(todo) {
       this.beforeEditCache = todo.title;

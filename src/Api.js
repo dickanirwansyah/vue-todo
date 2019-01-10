@@ -27,6 +27,6 @@ export default {
         completed: completed
     }),
 
-    removeForId: (id) => instance.delete('api/todo')
+    removeForId: (id) => instance.delete('api/todo/'+id)
 
 }
